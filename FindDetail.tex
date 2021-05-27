@@ -1,0 +1,519 @@
+\chapter{Определение положения и ориентации детали}
+Одной из целей автоматизации производственных процессов является сведение к минимуму влияния человеческого фактора.
+Однако, полностью нивелировать его практически невозможно.
+Неточности возникают с момента монтажа, когда может быть допущено недостаточное выравнивание оборудования относительно уровня пола или могут присутствовать неровности самого фундамента.
+Также не всегда возможно разработать такую оснастку, в которой изделие при закреплении каждый раз будет позиционироваться одинаково.
+
+Чтобы скомпенсировать неточности в позиционировании изделия, необходимо определить его положение и ориентацию в абсолютной системе координат, связанной с основанием робота.
+
+
+\section{Существующие методы определение положения и ориентации}
+
+\subsection{Системы технического зрения}
+Одним из способов определения положения и ориентации изделия является использование систем технического зрения.
+
+Как правило, системы технического зрения для роботов -- это готовые интегрированные решения, предлагаемые производителями в расширенной комплектации оборудования.
+С одной стороны, это гарантирует полную совместимость системы технического зрения с оборудованием комплекса.
+С другой, это накладывает ограничения на применение системы технического зрения для решения других задач, что только усугубляется необходимостью в использовании проприетарного программного обеспечения.
+
+Использование систем технического зрения также связано с необходимостью соблюдения некоторых специфичных условий для окружающей среды, таких, как правильное позиционирование камеры относительно объекта, хорошая освещённость.
+При том, что стоимость систем технического зрения, способных обеспечить высокую точность определения положения и ориентации изделия, достаточно высока.
+
+\subsection{Методы на основе касания}
+При производстве свариваемых заготовок, как правило, большого размера, допускаются различные отклонения и допуски.
+Для того, чтобы компенсировать низкую точность обработки изделий перед сваркой, разрабатывают алгоритмы определения положения изделия на основании касаний его рабочим инструментом.
+
+Подобный метод использовался в работе~\cite{Fei_Gao_2015} и был направлен на определение смещений свариваемых конструкций.
+Такой способ выгодно отличается от систем технического зрения тем, что он не требует дополнительного дорогостоящего оборудования при обеспечении высокой точности.
+Как правило, суть таких алгоритмов заключается в медленном перемещении рабочей точки инструмента внутри области, в которой положение изделия является допустимым.
+При обнаружении касания, координаты рабочей точки фиксируются и используются для дальнейшего пересчёта и определения положения изделия.
+При выходе рабочей точки за пределы допустимой области, условия поиска изменяются, либо операция поиска прекращается из-за необходимости вмешательства оператора.
+
+
+\section{Определение касания}
+Для проведения опытных работ был выделен сварочный аппарат Panasonic YD-500KR, представленный на рисунке~\ref{fig:Find Touch:Panasonic YD-500KR}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/FindDetail/Panasonic_YD-500KR}
+    \caption{Сварочный аппарат Panasonic YD-500KR}
+    \label{fig:Find Touch:Panasonic YD-500KR}
+\end{figure}
+
+Сварочный аппарат используется совместно с устройством подачи проволоки, к которому подключается сварочная горелка.
+Как видно на рисунке~\ref{fig:Find Touch:Panasonic YD-500KR}, сварочная горелка имеет эргономичную форму и не подразумевает возможности крепления к роботу.
+Потому, для её крепления к фланцу робота был разработан и изготовлен специальный крепёж.
+Фотография закреплённой на роботе горелки приведена на рисунке~\ref{fig:Find Touch:Weld Holder}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/FindDetail/WeldHolder}
+    \caption{Разработанный крепёж для сварочной горелки}
+    \label{fig:Find Touch:Weld Holder}
+\end{figure}
+
+Используемый сварочный аппарат предназначен для полуавтоматической сварки.
+То есть, присадочный материал в виде проволоки играет роль электрода и непрерывно подаётся с катушки в сварочную ванну.
+В процессе сварки, сварочная дуга образуется между присадочной проволокой и изделием, которое подключено к выходу сварочного аппарата с полярностью, обратной полярности проволоки.
+При прикосновении изделия электродом, цепь сварочного источника замыкается, соответственно, напряжение в цепи падает.
+Зафиксировав падение напряжения, можно определить наличие касания.
+
+Как правило, современные сварочные аппараты, даже не предназначенные для роботизированной сварки, имеют возможность снятия показаний тока и напряжения, но сварочный аппарат Panasonic YD-500KR не современный и такой опции не имеет.
+Для определения касания была разработана и реализована схема подключения, изображённая на рисунке~\ref{fig:Find Touch:Electrical Circuit}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/FindDetail/ElectricalCircuit}
+    \caption{Электрическая схема для определения касания}
+    \label{fig:Find Touch:Electrical Circuit}
+\end{figure}
+
+На схеме E11 и E12 -- источники постоянного напряжения сварочного аппарата для напряжения сварки и для питания внутренней логики соответственно.
+E2 -- источник напряжения логики контроллера робота.
+Контакт Kw условно обозначает наличие на электроде сварочного напряжения, а контакт Kt -- наличие контакта между электродом и изделием.
+В начальном состоянии, когда оба контакта разомкнуты, светодиод оптопары U излучает свет под действием тока, протекающего от источника E12 через резистор R14.
+Благодаря этому, фототранзистор оптопары находится в открытом положении, а напряжение между его контактами остаётся пренебрежительно малым.
+
+При контакте электрода и изделия, то есть при замыкании контакта Kt, ток источника E12 протекает через этот контакт, минуя цепи с резисторами R13 и R14.
+Светодиод оптопары перестаёт светить, фототранзистор запирается, а между его контактов фиксируется напряжение +24 В, что сигнализирует о наличии касания между электродом и изделием.
+
+
+\section{Расчёт ориентации детали}
+Наплавка выполняется на уплотнительную поверхность, находящуюся внутри корпуса.
+Для удобства дальнейшей работы, в центре поверхности наплавки расположим связанную с ней систему координат.
+Пример изделия с выделенной поверхностью наплавки приведён на рисунке~\ref{fig:Find Touch:Valve Example}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/FindDetail/DetailExample}
+    \caption{Модель корпуса с выделенной поверхностью наплавки}
+    \label{fig:Find Touch:Valve Example}
+\end{figure}
+
+Поверхность наплавки расположена параллельно плоскости верхнего фланца.
+Поэтому, для определения ориентации связанной СК достаточно определить ориентацию плоскости фланца.
+
+Для нахождения ориентации плоскости фланца, необходимо определить три точки на его поверхности.
+Однако, для компенсации возможных неточностей в определении координат точек касания, предлагается использовать большее количество опорных точек.
+Поиск точек на поверхности осуществляется при помощи движения рабочего инструмента робота вертикально сверху-вниз до фиксирования касания, либо до выхода из заранее определённой области поиска.
+Найденные точки удобнее всего аппроксимировать плоскостью при помощи метода наименьших квадратов.
+
+Рассмотрим уравнение плоскости:
+
+\begin{equation}
+    \label{eq:Plane}
+    z = A x + B y + C,
+\end{equation} \\
+где $x$, $y$, $z$ -- координаты точек, принадлежащих плоскости, $A$ и $B$ -- коэффициенты наклона плоскости относительно осей $X$ и $Y$ соответственно, $C$ -- вертикальное смещение плоскости по оси $Z$.
+
+Тогда функция для нахождения ошибки $i$-го измерения будет иметь следующий вид:
+
+\begin{equation}
+    \label{eq:Plane_MNK_e}
+    e(x_i, y_i, z_i) = A x_i + B y_i + C - z_i.
+\end{equation} \\
+
+Задачей метода наименьших квадратов является минимизация суммы квадратов ошибок, то есть следующей функции:
+
+\begin{equation}
+    \label{eq:Plane_MNK_S}
+    S(A, B, C) = \sum_{i=1}^{n} \left[ e(x_i, y_i, z_i) \right]^2.
+\end{equation} \\
+
+Функции~\ref{eq:Plane_MNK_S} достигает своего минимального значение в такой точке, в которой градиент этой функции равен нулю.
+
+\begin{gather*}
+    \nabla S(A, B, C) = 0, \\
+    \begin{cases}
+        \begin{aligned}
+            \dfrac{\partial S(A, B, C)}{\partial A} = 2 \sum_{i=1}^{n} \left[
+            \dfrac{\partial e(x_i, y_i, z_i)}{\partial A} \cdot e(x_i, y_i, z_i) \right] = 0 \\
+            \dfrac{\partial S(A, B, C)}{\partial B} = 2 \sum_{i=1}^{n} \left[
+            \dfrac{\partial e(x_i, y_i, z_i)}{\partial B} \cdot e(x_i, y_i, z_i) \right] = 0 \\
+            \dfrac{\partial S(A, B, C)}{\partial C} = 2 \sum_{i=1}^{n} \left[
+            \dfrac{\partial e(x_i, y_i, z_i)}{\partial C} \cdot e(x_i, y_i, z_i) \right] = 0
+        \end{aligned}
+    \end{cases}
+\end{gather*}
+
+\begin{align}
+    \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             &\sum_{i=1}^{n} \left[ x_i \left( A x_i + B y_i - C - z_i \right) \right] = 0 \\
+             &\sum_{i=1}^{n} \left[ y_i \left( A x_i + B y_i - C - z_i \right) \right] = 0 \\
+             &\sum_{i=1}^{n} \left[ - \left( A x_i + B y_i - C - z_i \right) \right] = 0
+         \end{aligned}
+    \end{cases} \\ \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             &\sum_{i=1}^{n} \left[ A x_i^2 + B x_i y_i - C x_i - x_i z_i \right] = 0 \\
+             &\sum_{i=1}^{n} \left[ A x_i y_i + B y_i^2 - C y_i - y_i z_i \right] = 0 \\
+             &\sum_{i=1}^{n} \left[ A x_i + B y_i - C - z_i \right] = 0
+         \end{aligned}
+    \end{cases} \\ \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             &A \sum_{i=1}^{n} x_i^2
+             + B \sum_{i=1}^{n} x_i y_i
+             - C \sum_{i=1}^{n} x_i
+             - \sum_{i=1}^{n} x_i z_i = 0 \\
+             &A \sum_{i=1}^{n} x_i y_i
+             + B \sum_{i=1}^{n} y_i^2
+             - C \sum_{i=1}^{n} y_i
+             - \sum_{i=1}^{n} y_i z_i = 0 \\
+             &A \sum_{i=1}^{n} x_i
+             + B \sum_{i=1}^{n} y_i
+             - C \cdot n - \sum_{i=1}^{n} z_i = 0
+         \end{aligned}
+    \end{cases} \\
+    &\begin{cases}
+         \label{eq:Plane_MNK_Final_System}
+         \begin{aligned}
+             &A \sum_{i=1}^{n} x_i^2
+             + B \sum_{i=1}^{n} x_i y_i
+             - C \sum_{i=1}^{n} x_i
+             = \sum_{i=1}^{n} x_i z_i \\
+             &A \sum_{i=1}^{n} x_i y_i
+             + B \sum_{i=1}^{n} y_i^2
+             - C \sum_{i=1}^{n} y_i
+             = \sum_{i=1}^{n} y_i z_i \\
+             &A \sum_{i=1}^{n} x_i
+             + B \sum_{i=1}^{n} y_i
+             - C \cdot n = \sum_{i=1}^{n} z_i
+         \end{aligned}
+    \end{cases}
+\end{align} \\
+
+Система~\ref{eq:Plane_MNK_Final_System} имеет следующий вид:
+
+\begin{equation}
+    \label{eq:Plane_Cramer_System}
+    \begin{cases}
+        \begin{aligned}
+            A a_{11} + B a_{12} + C a_{13} = b_1 \\
+            A a_{21} + B a_{22} + C a_{23} = b_2 \\
+            A a_{31} + B a_{32} + C a_{33} = b_3
+        \end{aligned}
+    \end{cases},
+\end{equation} \\
+где $A$, $B$ и $C$ -- искомые коэффициенты уравнения плоскости~\ref{eq:Plane},
+
+\begin{alignat*}{3}
+    a_{11} &= \sum_{i=1}^{n} x_i^2, & \qquad
+    a_{12} &= \sum_{i=1}^{n} x_i y_i, & \qquad
+    a_{13} &= - \sum_{i=1}^{n} x_i, \\
+    a_{21} &= \sum_{i=1}^{n} x_i y_i, &
+    a_{22} &= \sum_{i=1}^{n} y_i^2, &
+    a_{23} &= - \sum_{i=1}^{n} y_i, \\
+    a_{31} &= \sum_{i=1}^{n} x_i, &
+    a_{32} &= \sum_{i=1}^{n} y_i, &
+    a_{33} &= - n.
+\end{alignat*} \\
+
+Решим систему~\ref{eq:Plane_Cramer_System} методом Крамера:
+
+\begin{alignat*}{3}
+    A &= \dfrac{\Delta_A}{\Delta}, & \qquad
+    B &= \dfrac{\Delta_B}{\Delta}, & \qquad
+    C &= \dfrac{\Delta_C}{\Delta},
+\end{alignat*} \\
+где
+
+\begin{alignat*}{2}
+    \Delta &= \begin{vmatrix}
+                  a_{11} & a_{12} & a_{13} \\
+                  a_{21} & a_{22} & a_{23} \\
+                  a_{31} & a_{32} & a_{33}
+    \end{vmatrix}, & \qquad
+    \Delta_A &= \begin{vmatrix}
+                    b_1 & a_{12} & a_{13} \\
+                    b_2 & a_{22} & a_{23} \\
+                    b_3 & a_{32} & a_{33}
+    \end{vmatrix}, \\
+    \Delta_B &= \begin{vmatrix}
+                    a_{11} & b_1 & a_{13} \\
+                    a_{21} & b_2 & a_{23} \\
+                    a_{31} & b_3 & a_{33}
+    \end{vmatrix}, & \qquad
+    \Delta_C &= \begin{vmatrix}
+                    a_{11} & a_{12} & b_1 \\
+                    a_{21} & a_{22} & b_2 \\
+                    a_{31} & a_{32} & b_3
+    \end{vmatrix}.
+\end{alignat*} \\
+
+Найдя коэффициенты уравнения плоскости~\ref{eq:Plane}, рассчитаем углы наклона плоскости фланца и, соответственно, углы наклона связанной с поверхностью наплавки системой координат относительно осей $X$ и $Y$ абсолютной системы координат:
+
+\begin{align*}
+    \alpha &= \arctan(A), \\
+    \beta &= \arctan(B).
+\end{align*}
+
+
+\section{Расчёт положения детали}
+Расчёт положения детали основывается на определении точек, лежащих на внутренней грани входного отверстия корпуса.
+Поиск точек на грани входного отверстия происходит в повёрнутой системе координат, параметры которой были определены при поиске ориентации корпуса.
+Таким образом, все найденные точки будут лежать в плоскости $XY$.
+
+Так как входное отверстие имеет форму окружности, то для расчёта координат его центра достаточно трёх точек.
+Но, как и при определении ориентации детали, для компенсации возможных неточностей в определении координат точек касания, предлагается использовать большее количество опорных точек.
+Поиск точек осуществляется движением от произвольной точки внутри отверстия до соприкосновения с изделием или до выхода из области поиска.
+Найденное произвольное количество точек аппроксимируется методом наименьших квадратов.
+
+Уравнение окружности имеет следующий вид:
+
+\begin{equation*}
+    \left( x - x_0 \right)^2 + \left( y - y_0 \right)^2 = r^2,
+\end{equation*} \\
+где $x$, $y$ -- координаты точек, лежащих на окружности, $x_0$ и $y_0$ -- координаты центра окружности, $r$ - радиус окружности.
+
+Функция ошибки $i$-го измерения будет иметь следующий вид:
+
+\begin{equation}
+    \begin{aligned}
+        \label{eq:Circle_MNK_e}
+        e(x_i, y_i) &= \left( x_i - x_0 \right)^2 + \left( y_i - y_0 \right)^2 - r^2 = \\
+        &= x_i^2 + y_i^2 - 2 (x_i x_0 + y_i y_0) + x_0^2 + y_0^2 - r^2.
+    \end{aligned}
+\end{equation} \\
+
+Тогда функция для минимизации квадрата ошибок будет иметь следующий вид:
+
+\begin{equation*}
+    S(x_0, y_0, r) = \sum_{i=1}^{n} \left[ e(x_i, y_i) \right]^2.
+\end{equation*} \\
+
+Задача сводится к поиску таких значений $x_0$ и $y_0$, при которой функция $S(x_0, y_0, r)$ достигает своего минимума, то есть её частные производные по $x_0$ и $y_0$ равны нулю:
+
+\begin{align}
+    \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             \dfrac{\partial S(x_0, y_0, r)}{\partial x_0} = 2 \sum_{i=1}^{n} \left[
+             \dfrac{\partial e(x_i, y_i)}{\partial x_0} \cdot e(x_i, y_i) \right] = 0 \\
+             \dfrac{\partial S(x_0, y_0, r)}{\partial y_0} = 2 \sum_{i=1}^{n} \left[
+             \dfrac{\partial e(x_i, y_i)}{\partial y_0} \cdot e(x_i, y_i)\right] = 0 \\
+             \dfrac{\partial S(x_0, y_0, r)}{\partial r} = 2 \sum_{i=1}^{n} \left[
+             \dfrac{\partial e(x_i, y_i)}{\partial y_0} \cdot e(x_i, y_i)\right] = 0
+         \end{aligned}
+    \end{cases} \\ \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             &2 \sum_{i=1}^{n} \left[ (2 x_0 - 2 x_i) \cdot e(x_i, y_i) \right] = 0 \\
+             &2 \sum_{i=1}^{n} \left[ (2 y_0 - 2 y_i) \cdot e(x_i, y_i) \right] = 0 \\
+             &2 \sum_{i=1}^{n} \left[ 2 r \cdot e(x_i, y_i) \right] = 0
+         \end{aligned}
+    \end{cases} \\ \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             &4 \sum_{i=1}^{n} \left[ x_0 \cdot e(x_i, y_i) - x_i \cdot e(x_i, y_i) \right] = 0 \\
+             &4 \sum_{i=1}^{n} \left[ y_0 \cdot e(x_i, y_i) - x_i \cdot e(x_i, y_i) \right] = 0 \\
+             &4 n \cdot r \sum_{i=1}^{n} e(x_i, y_i) = 0
+         \end{aligned}
+    \end{cases} \\
+    &\begin{cases}
+         \label{eq:Circle_MNK_system}
+         \begin{aligned}
+             &n \cdot x_0 \sum_{i=1}^{n} e(x_i, y_i)
+             - \sum_{i=1}^{n} \left[ x_i \cdot e(x_i, y_i) \right] = 0 \\
+             &n \cdot y_0 \sum_{i=1}^{n} e(x_i, y_i)
+             - \sum_{i=1}^{n} \left[ y_i \cdot e(x_i, y_i) \right] = 0 \\
+             &\sum_{i=1}^{n} e(x_i, y_i) = 0
+         \end{aligned}
+    \end{cases}
+\end{align} \\
+
+Так как минимальным значением функции $S(x_0, y_0, r)$ является ноль, то:
+
+\begin{equation}
+    \label{eq:Circle_MNK_e_is_zero}
+    \sum_{i=1}^{n} e(x_i, y_i) = 0.
+\end{equation} \\
+
+Подставив~\ref{eq:Circle_MNK_e_is_zero} в~\ref{eq:Circle_MNK_system}, получим:
+
+\begin{equation*}
+    \begin{cases}
+        \begin{aligned}
+            &\sum_{i=1}^{n} \left[ x_i \cdot e(x_i, y_i) \right] = 0 \\
+            &\sum_{i=1}^{n} \left[ y_i \cdot e(x_i, y_i) \right] = 0 \\
+            &\sum_{i=1}^{n} e(x_i, y_i) = 0
+        \end{aligned}
+    \end{cases}
+\end{equation*} \\
+
+Раскрыв $e(x_i, y_i)$ в соответствии с~\ref{eq:Circle_MNK_e} и преобразовав систему уравнений, получим:
+
+\begin{align}
+    \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             &\sum_{i=1}^{n} \left[ x_i \left(
+             x_i^2 + y_i^2 - 2 (x_i x_0 + y_i y_0) + x_0^2 + y_0^2 - r^2 \right) \right] = 0 \\
+             &\sum_{i=1}^{n} \left[ y_i \left(
+             x_i^2 + y_i^2 - 2 (x_i x_0 + y_i y_0) + x_0^2 + y_0^2 - r^2 \right) \right] = 0 \\
+             &\sum_{i=1}^{n} \left[
+             x_i^2 + y_i^2 - 2 (x_i x_0 + y_i y_0) + x_0^2 + y_0^2 - r^2 \right] = 0
+         \end{aligned}
+    \end{cases} \\ \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             &\sum_{i=1}^{n} \left[
+             x_i^3 + x_i y_i^2 - 2 x_i (x_i x_0 + y_i y_0)
+             + x_i \left( x_0^2 + y_0^2 - r^2 \right) \right] = 0 \\
+             &\sum_{i=1}^{n} \left[
+             x_i^2 y_i + y_i^3 - 2 y_i (x_i x_0 + y_i y_0)
+             + y_i \left( x_0^2 + y_0^2 - r^2 \right) \right] = 0 \\
+             &\sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2
+             - 2 \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right)
+             + n \left( x_0^2 + y_0^2 - r^2 \right) = 0
+         \end{aligned}
+    \end{cases} \\
+    &\begin{cases}
+         \label{eq:Circle_MNK_full_system}
+         \begin{aligned}
+             &\sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
+             - 2 \sum_{i=1}^{n} x_i \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right) + \\
+             &\qquad + \sum_{i=1}^{n} x_i \left( x_0^2 + y_0^2 - r^2 \right) = 0 \\
+             \\
+             &\sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
+             - 2 \sum_{i=1}^{n} y_i \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right) + \\
+             &\qquad + \sum_{i=1}^{n} y_i \left( x_0^2 + y_0^2 - r^2 \right) = 0 \\
+             \\
+             &x_0^2 + y_0^2 - r^2 = - \dfrac{1}{n} \left(
+             \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2
+             - 2 \left( x_0 \sum_{i=1}^{n} x_i
+             + y_0 \sum_{i=1}^{n} y_i \right)\right)
+         \end{aligned}
+    \end{cases}
+\end{align} \\
+
+Подставим значение выражения $x_0^2 + y_0^2 - r^2$ из третьего уравнения системы~\ref{eq:Circle_MNK_full_system} в её первые два уравнения:
+
+\begin{align}
+    \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             &\sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2 - 2 \left(
+             x_0 \sum_{i=1}^{n} x_i^2 + y_0 \sum_{i=1}^{n} x_i y_i \right) - \\
+             &\qquad - \dfrac{1}{n} \sum_{i=1}^{n} x_i \left(
+             \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2
+             - 2 \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right)\right) = 0 \\
+             \\
+             &\sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3 - 2 \left(
+             x_0 \sum_{i=1}^{n} x_i y_i + y_0 \sum_{i=1}^{n} y_i^2 \right) - \\
+             &\qquad - \dfrac{1}{n} \sum_{i=1}^{n} y_i \left(
+             \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2
+             - 2 \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right)\right) = 0
+         \end{aligned}
+    \end{cases} \\ \nonumber
+    &\begin{cases}
+         \begin{aligned}
+             &2 x_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i - \sum_{i=1}^{n} x_i^2 \right)
+             + 2 y_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i
+             - \sum_{i=1}^{n} x_i y_i \right) + \\
+             &\qquad + \sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
+             - \dfrac{1}{n} \sum_{i=1}^{n} x_i
+             \left( \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right) = 0 \\
+             \\
+             &2 x_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i
+             - \sum_{i=1}^{n} x_i y_i \right)
+             + 2 y_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i - \sum_{i=1}^{n} y_i^2 \right) + \\
+             &\qquad + \sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
+             - \dfrac{1}{n} \sum_{i=1}^{n} y_i
+             \left(\sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right) = 0
+         \end{aligned}
+    \end{cases} \\
+    &\begin{cases}
+         \label{eq:Circle_MNK_final_system}
+         \begin{aligned}
+             &2 x_0 \left( \sum_{i=1}^{n} x_i^2 - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i \right)
+             + 2 y_0 \left( \sum_{i=1}^{n} x_i y_i
+             - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i \right) = \\
+             &\qquad = \sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
+             - \dfrac{1}{n} \sum_{i=1}^{n} x_i \left( \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right) \\
+             \\
+             &2 x_0 \left( \sum_{i=1}^{n} x_i y_i
+             - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i \right)
+             + 2 y_0 \left( \sum_{i=1}^{n} y_i^2 - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i \right) = \\
+             &\qquad = \sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
+             - \dfrac{1}{n} \sum_{i=1}^{n} y_i \left( \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right)
+         \end{aligned}
+    \end{cases}
+\end{align} \\
+
+Нетрудно заметить, что система~\ref{eq:Circle_MNK_final_system} имеет следующий вид:
+
+\begin{equation}
+    \label{eq:SLAU_system}
+    \begin{cases}
+        \begin{aligned}
+            x_0 a_{11} + y_0 a_{12} = b_1
+            \\
+            x_0 a_{21} + y_0 a_{22} = b_2
+        \end{aligned}
+    \end{cases},
+\end{equation} \\
+где
+
+\begin{alignat*}{2}
+    a_{11} &= 2 \left( \sum_{i=1}^{n} x_i^2 - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i \right), & \qquad
+    a_{12} &= 2 \left( \sum_{i=1}^{n} x_i y_i - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i \right), \\
+    a_{21} &= 2 \left( \sum_{i=1}^{n} x_i y_i - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i \right), &
+    a_{22} &= 2 \left( \sum_{i=1}^{n} y_i^2 - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i \right),
+\end{alignat*} \\
+
+\begin{align*}
+    b_1 &= \sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
+    - \dfrac{1}{n} \sum_{i=1}^{n} x_i \left(
+    \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right), \\
+    b_2 &= \sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
+    - \dfrac{1}{n} \sum_{i=1}^{n} y_i \left(
+    \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right).
+\end{align*} \\
+
+Система~\ref{eq:SLAU_system} является нормальной формой системы двух линейных алгебраических уравнений с двумя неизвестными и имеет единственное решение.
+Найдём его метод Крамера:
+
+\begin{equation*}
+    x_0 = \dfrac{\Delta_{x_0}}{\Delta}, \qquad
+    y_0 = \dfrac{\Delta_{y_0}}{\Delta},
+\end{equation*} \\
+где
+
+\begin{align*}
+    \Delta = \begin{vmatrix}
+                 a_{11} & a_{12} \\
+                 a_{21} & a_{22}
+    \end{vmatrix} &= a_{11} a_{22} - a_{12} a_{21}, \\
+    \Delta_{x_0} = \begin{vmatrix}
+                       b_1 & a_{12} \\
+                       b_2 & a_{22}
+    \end{vmatrix} &= a_{22} b_1 - a_{12} b_2, \\
+    \Delta_{y_0} = \begin{vmatrix}
+                       a_{11} & b_1 \\
+                       a_{21} & b_2
+    \end{vmatrix} &= a_{11} b_2 - a_{21} b_1.
+\end{align*} \\
+
+Зная положение входного отверстия изделия, его ориентацию и высоту от фланца до поверхности наплавки, можно точно восстановить положение и ориентацию связанной с поверхностью наплавки системой координат.
+
+
+%\section{Расчёт ориентации горелки внутри корпуса}
+%Наиболее сложными для наплавки являются корпуса, где поверхность наплавки шире, чем диаметр входного отверстия.
+%На рисунке~\ref{fig:Find Touch:Best Example Valve} приведён эскиз такого корпуса.
+%
+%\begin{figure}[H]
+%    \centering
+%    \vspace{14pt}
+%    \includegraphics[width=\linewidth]{Figures/Find Touch/Best Example Valve}
+%    \caption{Пример корпуса с поверхностью наплавки шире входного отверстия}
+%    \label{fig:Find Touch:Best Example Valve}
+%\end{figure}
+%
+%При наплавке поверхностей внутри подобных корпусов, необходимо ориентировать сварочную горелку таким образом, чтобы она в любой точке рабочей траектории не соприкасалась с входным отверстием детали.

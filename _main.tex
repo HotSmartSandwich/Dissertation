@@ -1,0 +1,31 @@
+\documentclass[utf8x]{G7-32}  % Стиль (по умолчанию будет 14pt)
+
+% Общие настройки
+\include{Preamble}
+
+% Настройки листингов
+\include{Preamble-Listings}
+
+\begin{document}
+    \includepdf{TitlePage}  % Титульный лист
+
+    \frontmatter  % Отключение нумерации
+
+    \include{Annotation}  % Аннотация
+    \include{Introduction}  % Введение
+
+    \mainmatter  % Начало нумерации
+
+    \include{Problem}  % Проблема
+    \include{SolutionsOverview}  % Обзор существующих решений
+    \include{FindDetail}  % Определние положения и ориентации изделия
+    \include{Software}  % Программное обеспечение
+    \include{Experiment}  % Опытные работы
+
+    \backmatter  % Конец нумерации
+
+    \include{Conclusion}  % Заключение
+    \include{Bibliography}  % Список использованных источников
+    \tableofcontents  % Содержание
+\end{document}
+
