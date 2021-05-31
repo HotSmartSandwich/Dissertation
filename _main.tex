@@ -10,13 +10,14 @@
     \includepdf{TitlePage}  % Титульный лист
 
     \frontmatter  % Отключение нумерации
+    \renewcommand\thefigure{\arabic{figure}}
 
     \include{Annotation}  % Аннотация
     \include{Introduction}  % Введение
 
     \mainmatter  % Начало нумерации
+    \renewcommand\thefigure{\thechapter.\arabic{figure}}
 
-    \include{Problem}  % Проблема
     \include{SolutionsOverview}  % Обзор существующих решений
     \include{FindDetail}  % Определние положения и ориентации изделия
     \include{Software}  % Программное обеспечение
@@ -28,4 +29,3 @@
     \include{Bibliography}  % Список использованных источников
     \tableofcontents  % Содержание
 \end{document}
-
