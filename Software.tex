@@ -109,18 +109,20 @@
 Буквенные обозначения позволяют однозначно определить положение звеньев робота.
 Расшифровка буквенных обозначений приведена в таблице~\ref{tab:RobotConfig}.
 
-\begin{longtable}[H]{|p{0.25\linewidth}|p{0.25\linewidth}|p{0.4\linewidth}|}
+\begin{table}[H]
     \caption{Расшифровка буквенных обозначений}
-    \label{tab:RobotConfig} \\
-    \hline
-    Обозначение & Расшифровка   & Значение                \\ \hline
-    N           & wrist No-flip & запястье не перевёрнуто \\ \hline
-    F           & wrist Flip    & запястье перевёрнуто    \\ \hline
-    U           & elbow Up      & локоть вверх            \\ \hline
-    D           & elbow Down    & локоть вниз             \\ \hline
-    T           & config Top    & подход спереди          \\ \hline
-    B           & config Bottom & подход сзади            \\ \hline
-\end{longtable}
+    \label{tab:RobotConfig}
+    \begin{tabular}{|p{0.26\linewidth}|p{0.26\linewidth}|p{0.4\linewidth}|}
+        \hline
+        Обозначение & Расшифровка   & Значение                \\ \hline
+        N           & wrist No-flip & запястье не перевёрнуто \\ \hline
+        F           & wrist Flip    & запястье перевёрнуто    \\ \hline
+        U           & elbow Up      & локоть вверх            \\ \hline
+        D           & elbow Down    & локоть вниз             \\ \hline
+        T           & config Top    & подход спереди          \\ \hline
+        B           & config Bottom & подход сзади            \\ \hline
+    \end{tabular}
+\end{table}
 
 Большая часть приведённых конфигураций является экзотической.
 Как правило, в работе используется конфигурация <<NUT>> и в ходе выполнения программы она не изменяется.

@@ -11,6 +11,7 @@
 
     \frontmatter  % Отключение нумерации
     \renewcommand\thefigure{\arabic{figure}}
+    \renewcommand\thetable{\arabic{table}}
 
     \tableofcontents  % Содержание
     \include{Annotation}  % Аннотация
@@ -18,6 +19,7 @@
 
     \mainmatter  % Начало нумерации
     \renewcommand\thefigure{\thechapter.\arabic{figure}}
+    \renewcommand\thetable{\thechapter.\arabic{table}}
 
     \include{SolutionsOverview}  % Обзор существующих решений
     \include{FindDetail}  % Определние положения и ориентации изделия
