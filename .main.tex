@@ -1,4 +1,4 @@
-\documentclass[utf8x]{G7-32}  % Стиль (по умолчанию будет 14pt)
+\documentclass[utf8x]{G7-32}
 
 % Общие настройки
 \include{Preamble}
@@ -21,12 +21,11 @@
     \renewcommand\thefigure{\thechapter.\arabic{figure}}
     \renewcommand\thetable{\thechapter.\arabic{table}}
 
-    %TODO: Способы позиционирования изделия
     \include{SolutionsOverview}  % Обзор существующих решений
     \include{Software}  % Программное обеспечение
-    \include{RobotProgram}
+    \include{RobotProgram}  % Программы для робота
     \include{FindDetail}  % Определние положения и ориентации изделия
-    \include{Trajectory}
+    \include{Trajectory}  % Генерация траеткорий
     \include{Experiment}  % Опытные работы
 
     \backmatter  % Конец нумерации
