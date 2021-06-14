@@ -3,7 +3,7 @@
 В связи с проприетарностью встроенного программного обеспечения, при разработке информационно-управляющей системы было возможно использовать только ограниченный функционал, предлагаемый производителем оборудования.
 
 
-\section{Основные способы создания программ}
+\section{Способы создания программ}
 Базовым и наиболее распространённым в промышленности способом является программирование напрямую через пульт управления (Teach Pendant).
 Оператор вручную задаёт координаты каждой точки и ориентацию рабочего инструмента робота, либо сохраняет их в режиме обучения.
 Главным преимуществом такого подхода является простота и относительно высокая скорость написания простых программ работы.
@@ -129,4 +129,370 @@
 Численные обозначения указывают на количество полных оборотов сверх необходимого угла поворота для многооборотных сочленений.
 Как правило, количество полных оборотов необходимо учитывать при задании таких траекторий, когда происходит перекручивание запястья робота.
 
-При работе со сварочной горелкой, кабель которой закреплён не в полом запястье робота, а снаружи, такие перекручивания недопустимы, потому в дальнейшей работе конфигурация <<N U T, 0, 0, 0>> принимается постоянной и неизменяемой.
+При аналитическом решении обратной задачи кинематики в моменты подобных перекручиваний уставка угла вместо того, чтобы, например, измениться от +160° до +190°, резко изменится в противоположном направлении до -170°, что продемонстрировано на рисунке~\ref{fig:AngleChange}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/AngleChange}
+    \caption{Изменение угла}
+    \label{fig:AngleChange}
+\end{figure}
+
+Для того, чтобы миновать описанную проблему, можно либо отслеживать выход углов поворота сочленений за пределы интервала (-180°, +180°), в соответствии с чем, корректировать конфигурацию, либо изначально задавать целевые точки через углы поворота сочленений ($J_1$, $J_2$, $J_3$, $J_4$, $J_5$, $J_6$).
+Оба этих способа являются практически равноценными с точки зрения реализации, так как оба подразумевают решение обратной задачи кинематики.
+
+\subsection{Решение обратной задачи кинематики}
+Обратная задача кинематики предполагает нахождение углов поворота звеньев робота при заданных положении и ориентации его рабочей точки.
+
+Так как траектория движения рабочего инструмента робота состоит из множества точек, решение обратной задачи кинематики для каждой точки при помощи методов численной оптимизации может вызвать чрезмерные временные затраты.
+Поэтому, для решения обратной задачи кинематики был выбран геометрический метод.
+Начальными условиями для обратной задачи кинематики являются:
+
+\begin{itemize}
+    \item координаты целевой точки ($x_t$, $y_t$, $z_t$);
+    \item ориентация рабочего инструмента в целевой точке ($w$, $p$, $r$);
+    \item габариты установленного рабочего инструмента ($x_i$, $y_i$, $z_i$);
+    \item кинематическая схему робота, представленная на рисунке~\ref{fig:KinematicsSchema};
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=15cm]{Figures/KinematicsSchema}
+    \caption{Кинематическая схема шестиосевых роботов FANUC}
+    \label{fig:KinematicsSchema}
+\end{figure}
+
+Положительные направления вращения звеньев указаны направлением стрелок.
+
+Рассмотрим обратную задачу кинематики, как задачу поиска координат точек, соответствующих сочленениям робота и нахождения углов между этими точками.
+Модель робота и искомые точка представлены на рисунке~\ref{fig:ikp:dots_0}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/dots_0}
+    \caption{Модель робота с отмеченными искомыми точками}
+    \label{fig:ikp:dots_0}
+\end{figure}
+
+\paragraph{Шаг 1}
+
+Целевую точку представим в виде вектор-столбца $\overrightarrow{P}$:
+
+\begin{equation*}
+    \overrightarrow{P} =
+    \begin{bmatrix}
+        x_t \\
+        y_t \\
+        z_t
+    \end{bmatrix}.
+\end{equation*} \\
+
+Габариты рабочего инструмента так же представим в виде вектор-столбца $\overrightarrow{I}$:
+
+\begin{equation*}
+    \overrightarrow{I} =
+    \begin{bmatrix}
+        x_i \\
+        y_i \\
+        z_i
+    \end{bmatrix}.
+\end{equation*} \\
+
+Ориентацию рабочего инструмента робота выразим при помощи матрицы сложного поворота $O^{3\times3}$:
+
+\begin{gather*}
+    \begin{split}
+        O &=
+        \begin{bmatrix}
+            \cos(r) & -\sin(r) & 0 \\
+            \sin(r) & \cos(r)  & 0 \\
+            0       & 0        & 1
+        \end{bmatrix} \times
+        \begin{bmatrix}
+            \cos(p)  & 0 & \sin(p) \\
+            0        & 1 & 0       \\
+            -\sin(p) & 0 & \cos(p)
+        \end{bmatrix} \times
+        \begin{bmatrix}
+            1 & 0       & 0        \\
+            0 & \cos(w) & -\sin(w) \\
+            0 & \sin(w) & \cos(w)  \\
+        \end{bmatrix} = \\
+        &=
+        \begin{bmatrix}
+            \text{C}(p) \text{C}(r) & \text{S}(w) \text{S}(p) \text{C}(r) - \text{C}(w) \text{S}(r) & \text{C}(w) \text{S}(p) \text{C}(r) + \text{S}(w) \text{S}(r) \\
+            \text{C}(p)             & \text{S}(w) \text{S}(p) \text{S}(r) + \text{C}(w) \text{C}(r) & \text{C}(w) \text{S}(p) \text{S}(r) - \text{S}(w) \text{C}(r) \\
+            - \text{S}(p)           & \text{S}(w) \text{C}(p)                                       & \text{C}(w) \text{C}(p)
+        \end{bmatrix},
+    \end{split}
+\end{gather*} \\
+где $\text{S}(\alpha) = \sin(\alpha)$, $\text{С}(\alpha) = \cos(\alpha)$.
+
+Найдём векторы $\overrightarrow{p_5}$ и $\overrightarrow{p_4}$, указывающие на конец пятого и четвёртого сочленений робота соответственно:
+
+\begin{align*}
+    \overrightarrow{p_5} &= \overrightarrow{P} - O \times \overrightarrow{I}, \\
+    \overrightarrow{p_4} &= \overrightarrow{p_5} - O \times
+    \begin{bmatrix}
+        0 \\
+        0 \\
+        l_5
+    \end{bmatrix}.
+\end{align*} \\
+
+Проекция вектора $\overrightarrow{p_4}$ на плоскость XY позволяет найти угол $j_1$, так как это единственный угол, отвечающий за вращение в этой плоскости:
+
+\begin{equation*}
+    j_1 = \arctan \left( \dfrac{\overrightarrow{p_4}_Y}{\overrightarrow{p_4}_X} \right),
+\end{equation*} \\
+где индексы $\overrightarrow{p}_X$ и $\overrightarrow{p}_Y$ обозначают проекцию вектора $\overrightarrow{p}$ на соответствующую ось.
+
+\paragraph{Шаг 2}
+
+Для нахождения углов $j_2$ и $j_3$ рассмотрим робота в плоскости $XZ$.
+Для этого удобнее прибегнуть не к проекциям, а к развороту всех сочленений и звеньев робота на угол $-j_1$ вокруг оси $Z$, проходящей вертикально из основания робота.
+Модель робота после поворота представлена на рисунке~\ref{fig:ikp:dots_1}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/dots_1}
+    \caption{Модель робота после первого поворота}
+    \label{fig:ikp:dots_1}
+\end{figure}
+
+Рассчитаем новые координаты известных векторов:
+
+\begin{gather*}
+    \overrightarrow{p_2} =
+    \begin{bmatrix}
+        l_1 \\
+        0   \\
+        0
+    \end{bmatrix}, \\
+    \overrightarrow{p_4} =
+    \begin{bmatrix}
+        \cos(-j_1) & -\sin(-j_1) & 0 \\
+        \sin(-j_1) & \cos(-j_1)  & 0 \\
+        0          & 0           & 1
+    \end{bmatrix} \times \overrightarrow{p_4}, \\
+    \overrightarrow{p_5} =
+    \begin{bmatrix}
+        \cos(-j_1) & -\sin(-j_1) & 0 \\
+        \sin(-j_1) & \cos(-j_1)  & 0 \\
+        0          & 0           & 1
+    \end{bmatrix} \times \overrightarrow{p_5}, \\
+    \overrightarrow{P} =
+    \begin{bmatrix}
+        \cos(-j_1) & -\sin(-j_1) & 0 \\
+        \sin(-j_1) & \cos(-j_1)  & 0 \\
+        0          & 0           & 1
+    \end{bmatrix} \times \overrightarrow{P}.
+\end{gather*} \\
+
+\paragraph{Шаг 3}
+
+Несложно убедиться, что точки $p_1$, $p_2$, $p_3$, $p_4$ лежат в плоскости $XZ$.
+
+Задачу нахождения координат вектора $\overrightarrow{p_3}$ рассмотрим как задачу нахождения пересечения двух окружностей с центрами в точках $p_2$ и $p_4$ и радиусами $r_1$ и $r_2$ соответственно.
+Эскиз представлен на рисунке~\ref{fig:ikp:p3}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[width=\linewidth]{Figures/p3}
+    \caption{Нахождение координат точки $p_3$}
+    \label{fig:ikp:p3}
+\end{figure}
+
+Радиусы окружностей $r_1$ и $r_2$ выразим через длины звеньев робота, а расстояние между центрами окружностей $d$ через расстояние между точками $p_2$ и $p_4$:
+
+\begin{gather*}
+    r_1 = l_2, \\
+    r_2 = \sqrt{l_3^2 + l_4^2}, \\
+    d = \left| \overrightarrow{p_4} - \overrightarrow{p_2} \right|.
+\end{gather*} \\
+
+Найдём перпендикуляр $h$ через сторону $a$ прямоугольного треугольника, образованного точками $p_2$, $M$ и $p_3$:
+
+\begin{align*}
+    \begin{cases}
+        a^2 + h^2 = r_1^2 \\
+        b^2 + h^2 = r_2^2 \\
+        a + b = d
+    \end{cases} & \Rightarrow
+    \begin{cases}
+        a^2 - b^2 = r_1^2 - r_2^2 \\
+        b = d - a
+    \end{cases}, \\
+    a^2 - \left( d - a \right)^2 &= r_1^2 - r_2^2, \\
+    a^2 - \left( d - 2da + a^2 \right) &= r_1^2 - r_2^2, \\
+    2da - d^2 &= r_1^2 - r_2^2, \\
+    2da &= r_1^2 - r_2^2 + d^2, \\
+    a &= \dfrac{r_1^2 - r_2^2 + d^2}{2d}, \\
+    h &= \sqrt{r_1^2 - a^2}.
+\end{align*} \\
+
+Вычислим координаты точки $M$ и сформируем вектор $\overrightarrow{p_3}$:
+
+\begin{gather*}
+    \overrightarrow{M} = \overrightarrow{p_2} + \dfrac{a}{d} \left( \overrightarrow{p_4} - \overrightarrow{p_2} \right), \\
+    \overrightarrow{p_3} =
+    \begin{bmatrix}
+        \overrightarrow{M}_X - \dfrac{h}{d} \left( \overrightarrow{p_4} - \overrightarrow{p_2} \right)_Z \\
+        0                                                                                                \\
+        \overrightarrow{M}_Z + \dfrac{h}{d} \left( \overrightarrow{p_4} - \overrightarrow{p_2} \right)_X
+    \end{bmatrix}.
+\end{gather*} \\
+
+Зная координаты вектора $\overrightarrow{p_3}$, найдём углы $j_2$ и $j_3$:
+
+\begin{gather*}
+    j_2 = \dfrac{\pi}{2} - \arctan \left( \dfrac
+    {\left( \overrightarrow{p_3} - \overrightarrow{p_2} \right)_Z}
+    {\left( \overrightarrow{p_3} - \overrightarrow{p_2} \right)_X} \right), \\
+    j_3 = \arctan \left( \dfrac
+    {\left( \overrightarrow{p_4} - \overrightarrow{p_3} \right)_Z}
+    {\left( \overrightarrow{p_4} - \overrightarrow{p_3} \right)_X} \right) - \arctan\left( \dfrac{l_3}{l_4} \right).
+\end{gather*} \\
+
+\paragraph{Шаг 4}
+
+Повернём звенья робота вокруг сочленения $p_3$ на угол $j_3$, тем самым расположив четвёртое звено робота параллельно плоскости $XY$.
+Модель робота после поворота представлена на рисунке~\ref{fig:ikp:dots_2}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/dots_2}
+    \caption{Модель робота после второго поворота}
+    \label{fig:ikp:dots_2}
+\end{figure}
+
+Рассчитаем новые координаты векторов:
+
+\begin{gather*}
+    \overrightarrow{p_4} =
+    \begin{bmatrix}
+        \cos(j_3)  & 0 & \sin(j_3) \\
+        0          & 1 & 0         \\
+        -\sin(j_3) & 0 & \cos(j_3)
+    \end{bmatrix} \times \left( \overrightarrow{p_4} - \overrightarrow{p_3} \right) + \overrightarrow{p_3}, \\
+    \overrightarrow{p_5} =
+    \begin{bmatrix}
+        \cos(j_3)  & 0 & \sin(j_3) \\
+        0          & 1 & 0         \\
+        -\sin(j_3) & 0 & \cos(j_3)
+    \end{bmatrix} \times \left( \overrightarrow{p_5} - \overrightarrow{p_3} \right) + \overrightarrow{p_3}, \\
+    \overrightarrow{P} =
+    \begin{bmatrix}
+        \cos(j_3)  & 0 & \sin(j_3) \\
+        0          & 1 & 0         \\
+        -\sin(j_3) & 0 & \cos(j_3)
+    \end{bmatrix} \times \left( \overrightarrow{P} - \overrightarrow{p_3} \right) + \overrightarrow{p_3}.
+\end{gather*} \\
+
+Для нахождения угла $j_4$ рассмотрим точки $p_4$ и $p_5$ в плоскости $YZ$.
+Эскиз представлен на рисунке~\ref{fig:ikp:j4}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/j4}
+    \caption{Угол $j_4$ в плоскости $YZ$}
+    \label{fig:ikp:j4}
+\end{figure}
+
+Из рисунка~\ref{fig:ikp:j4} найдём угол $j_4$:
+
+\begin{gather*}
+    j_4 = -\dfrac{\pi}{2} - \arctan \left( \dfrac
+    {\left( \overrightarrow{p_5} - \overrightarrow{p_4} \right)_Z}
+    {\left( \overrightarrow{p_5} - \overrightarrow{p_4} \right)_Y} \right).
+\end{gather*} \\
+
+\paragraph{Шаг 5}
+
+Произведём поворот четвёртого звена робота на угол $j_4$, расположив тем самым точки $p_4$ и $p_5$ в плоскости $XZ$.
+Рассчитаем новые координаты векторов:
+
+\begin{gather*}
+    \overrightarrow{p_5} =
+    \begin{bmatrix}
+        1 & 0         & 0          \\
+        0 & \cos(j_4) & -\sin(j_4) \\
+        0 & \sin(j_4) & \cos(j_4)  \\
+    \end{bmatrix} \times \left( \overrightarrow{p_5} - \overrightarrow{p_4} \right) + \overrightarrow{p_4}, \\
+    \overrightarrow{P} =
+    \begin{bmatrix}
+        1 & 0         & 0          \\
+        0 & \cos(j_4) & -\sin(j_4) \\
+        0 & \sin(j_4) & \cos(j_4)  \\
+    \end{bmatrix} \times \left( \overrightarrow{P} - \overrightarrow{p_4} \right) + \overrightarrow{p_4}.
+\end{gather*} \\
+
+Эскиз представлен на рисунке~\ref{fig:ikp:j5}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/j5}
+    \caption{Угол $j_5$ в плоскости $XZ$}
+    \label{fig:ikp:j5}
+\end{figure}
+
+Из рисунка~\ref{fig:ikp:j5} найдём угол $j_5$:
+
+\begin{gather*}
+    j_5 = \arctan \left( \dfrac
+    {\left( \overrightarrow{p_5} - \overrightarrow{p_4} \right)_Z}
+    {\left( \overrightarrow{p_5} - \overrightarrow{p_4} \right)_X} \right).
+\end{gather*} \\
+
+\paragraph{Шаг 6}
+
+Произведём поворот пятого звена робота на угол $j_5$, что позволит расположить точки $p_5$ и $P$ в плоскости $YZ$.
+Рассчитаем новые координаты вектора $\overrightarrow{p_5}$ и вектора $\overrightarrow{P}$, обозначающего целевую точку:
+
+\begin{gather*}
+    \overrightarrow{p_5} =
+    \begin{bmatrix}
+        \cos(j_5)  & 0 & \sin(j_5) \\
+        0          & 1 & 0         \\
+        -\sin(j_5) & 0 & \cos(j_5)
+    \end{bmatrix} \times \left( \overrightarrow{p_5} - \overrightarrow{p_4} \right) + \overrightarrow{p_4}, \\
+    \overrightarrow{P} =
+    \begin{bmatrix}
+        \cos(j_5)  & 0 & \sin(j_5) \\
+        0          & 1 & 0         \\
+        -\sin(j_5) & 0 & \cos(j_5)
+    \end{bmatrix} \times \left( \overrightarrow{P} - \overrightarrow{p_4} \right) + \overrightarrow{p_4}.
+\end{gather*} \\
+
+Угол $j_6$ найдём аналогично углу $j_4$.
+Эскиз представлен на рисунке~\ref{fig:ikp:j6}.
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[height=10cm]{Figures/j6}
+    \caption{Угол $j_6$ в плоскости $YZ$}
+    \label{fig:ikp:j6}
+\end{figure}
+
+Из рисунка~\ref{fig:ikp:j6} найдём угол $j_6$:
+
+\begin{gather*}
+    j_6 = -\dfrac{pi}{2} - \arctan \left( \dfrac
+    {\left( \overrightarrow{P} - \overrightarrow{p_5} \right)_Z}
+    {\left( \overrightarrow{P} - \overrightarrow{p_5} \right)_X} \right).
+\end{gather*} \\
+
+Описанная последовательность нахождения углов и поворотов звеньев робота позволяет из заданного положения рабочего инструмента и его ориентации, рассчитать углы поворота всех сочленений робота.
+
+Несмотря на то, что алгоритм может выглядеть излишне громоздким, его программная реализация в составе системы управления выглядит достаточно просто и лаконично.
+Алгоритм совмещает в себе минимальную вычислительную сложность и высокую точность за счёт того, что в ходе вычислений не используются ни численные методы оптимизации, ни неустойчивые обратные тригонометрические функции, такие как арккосинус~\cite{bib:Fu_1987}.
+Так же выгодным отличием такого подхода от решения обратной задачи кинематики с использованием методов численной оптимизации является гарантированное сохранение заданной конфигурации, в то время как оптимизационное решение может сойтись в локальный минимум или привести к неестественному позиционированию.
