@@ -29,14 +29,14 @@
 Недостаточное количество точек может привести к значительному снижению точности движения по траектории.
 Чрезмерно завышенное число точек, в свою очередь, существенно сказывается на времени компиляции и загрузки программы работы.
 К тому же, более старые версии контроллеров не всегда справляются с обработкой программ работы большого объёма.
-Пример внешнего вида одной и той же траектории при разном количестве точек приведён на рисунке~\ref{fig:LowPointTrajectoryExample}.
+Пример внешнего вида одной и той же траектории при разном количестве точек приведён на рисунке~\ref{fig:Trajectory:LowPointTrajectoryExample}.
 
 \begin{figure}[H]
     \centering
     \vspace{14pt}
-    \includegraphics[width=\linewidth]{Figures/Software/LowPointTrajectoryExample}
+    \includegraphics[width=\linewidth]{Figures/Trajectory/LowPointTrajectoryExample}
     \caption{Траектория при разном количестве точек}
-    \label{fig:LowPointTrajectoryExample}
+    \label{fig:Trajectory:LowPointTrajectoryExample}
 \end{figure}
 
 Для того, чтобы иметь возможность менять количество точек в траектории, сама траектория должна описываться в параметрическом виде, где координаты каждой точки зависят от некоторого параметра $t$.
@@ -45,10 +45,18 @@
 Как было указано в разделе~\ref{sec:TrajectoryParameters}, траектория движения состоит из основного пути движения и наложенных на него колебаний.
 И основной путь, и колебания представляют собой набор точек.
 
-Для примера, рассмотрим траекторию, приведённую на рисунке~\ref{fig:LowPointTrajectoryExample}.
-Это траектория движения по окружности с круговые колебания.
+Для примера, рассмотрим траекторию, приведённую на рисунке~\ref{fig:Trajectory:LowPointTrajectoryExample}.
+Это траектория движения по окружности с круговыми колебаниями, изображёнными на рисунке~\ref{fig:Trajectory:CircleOscillation}.
 
-Сперва, вычисляется массив точек, из которых состоит основная траектория:
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[width=\linewidth]{Figures/Trajectory/CircleOscillation}
+    \caption{Пример круговых колебаний}
+    \label{fig:Trajectory:CircleOscillation}
+\end{figure}
+
+Сперва, вычисляется массив из $n$ точек, из которых состоит основная траектория:
 
 \begin{gather*}
     \begin{cases}
@@ -57,53 +65,51 @@
             \\
             y_p = \dfrac{D}{2} \cdot \sin t
         \end{aligned}
-    \end{cases}, \\
+    \end{cases} \\
     0 \leq t \leq 2 \pi,
 \end{gather*} \\
-где $D$ -- диаметр окружности.
+где $D$ -- диаметр окружности основной траектории.
 
-Для корректной генерации колебаний, для начала необходимо вычислить общее количество колебаний, которое зависит от частоты колебаний, протяжённости выбранного пути и скорости перемещения:
+Для корректной генерации колебаний, необходимо вычислить общее количество колебаний, которое зависит от частоты колебаний, протяжённости выбранного пути и скорости перемещения рабочего инструмента:
 
 \begin{equation*}
-    F_N = \dfrac{2 \pi \cdot D}{S} \cdot F,
+    F_N = \dfrac{2 \pi \cdot D}{\upsilon} \cdot F,
 \end{equation*} \\
-где $S$ -- скорость движения по траектории, $F$ -- частота колебаний.
+где $\upsilon$ -- скорость движения по траектории, $F$ -- частота колебаний.
 
 Вычисление точек колебаний осуществляется следующим образом:
 
 \begin{gather}
     \begin{cases}
-        \label{eq:OscillationCircle}
+        \label{eq:Trajectory:CircleOscillation}
         \begin{aligned}
             x_o = \dfrac{A_w}{2} \cdot \sin t \\
             \\
             y_o = \dfrac{A_h}{2} \cdot \cos t
         \end{aligned}
-    \end{cases}, \\
+    \end{cases} \\
     \nonumber
     0 \leq t \leq 2 \pi \cdot F_N,
 \end{gather} \\
-где $A_w$ -- амплитуда колебаний по ширине, $A_h$ -- амплитуда колебаний по высоте.
+где $A_w$ -- амплитуда колебаний по ширине, $A_h$ -- амплитуда колебаний по высоте, а общее количество точек соотвествует количеству точек основной траектории $n$.
 
-Для каждой точки траектории рассчитывается угол поворота колебания:
+Для каждой точки траектории рассчитывается угол направления колебания:
 
 \begin{equation*}
-    a_i = \arctan \dfrac{{y_p}_i - {y_p}_{i-1}}{{x_p}_i - {x_p}_{i-1}},
+    a_i = \arctan \left( \dfrac{{y_p}_i - {y_p}_{i-1}}{{x_p}_i - {x_p}_{i-1}} \right),
 \end{equation*} \\
-где $1 \leq i \leq F_N$ -- номер точки траектории.
+где $i \in [1, 2, ..., n]$ -- номер точки траектории.
 
 Точки колебаний поворачиваются на соответствующий номеру координаты угол.
 После чего, координаты повёрнутых точек складываются с координатами основного пути движения:
 
 \begin{gather*}
     \begin{bmatrix}
-    {x_t}
-        _i \\
+        {x_t}_i \\
         {y_t}_i
     \end{bmatrix} =
     \begin{bmatrix}
-    {x_p}
-        _i \\
+        {x_p}_i \\
         {y_p}_i
     \end{bmatrix} +
     \begin{bmatrix}
@@ -111,17 +117,26 @@
         \sin a_i & \cos a_i
     \end{bmatrix}
     \begin{bmatrix}
-    {x_o}
-        _i \\
+        {x_o}_i \\
         {y_o}_i
     \end{bmatrix}.
 \end{gather*} \\
 
 Таким образом происходит наложение колебаний на основной путь движения, что позволяет получить итоговую траекторию движения.
+Пример наложения круговых колебаний на траектории по прямой и по окружности изображён на рисунке~\ref{fig:Trajectory:CircleOscillationOnPath}
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[width=\linewidth]{Figures/Trajectory/CircleOscillationOnPath}
+    \caption{Пример наложения круговых колебаний на траектории движения по прямой и по окружности}
+    \label{fig:Trajectory:CircleOscillationOnPath}
+\end{figure}
 
 Важной особенностью разработанного алгоритма является его универсальность для разных типов колебаний.
-При добавлении колебаний нового типа, достаточно описать их в параметрической форме, подобной уравнению~\ref{eq:OscillationCircle}.
-Например, параметрическая форма для колебаний восьмёркой, представленных на рисунке~\ref{fig:OscillationEight}, имеет следующий вид:
+При добавлении колебаний нового типа, достаточно описать их в параметрической форме, подобной уравнению~\ref{eq:Trajectory:CircleOscillation}.
+
+Например, параметрическая форма для колебаний восьмёркой, представленных на рисунке~\ref{fig:Trajectory:EightOscillation}, имеет следующий вид:
 
 \begin{gather*}
     \begin{cases}
@@ -130,14 +145,53 @@
             \\
             &y_o = \dfrac{\dfrac{A_h}{2} \cdot \cos t}{1 + \sin^2 t}
         \end{aligned}
-    \end{cases}, \\
-    0 \leq t \leq 2 \pi \cdot F_N,
-\end{gather*} \\
+    \end{cases} \\
+    0 \leq t \leq 2 \pi \cdot F_N.
+\end{gather*}
 
 \begin{figure}[H]
     \centering
     \vspace{14pt}
-    \includegraphics[height=15cm]{Figures/Software/OscillationEight}
-    \caption{Пример траектории движения по окружности с колебаниями восьмёркой}
-    \label{fig:OscillationEight}
+    \includegraphics[width=\linewidth]{Figures/Trajectory/EightOscillation}
+    \caption{Пример колебаний восьмёркой}
+    \label{fig:Trajectory:EightOscillation}
+\end{figure}
+
+Наложение колебаний восьмёркой на траекторию движения по прямой и по окружности изображено на рисунке~\ref{fig:Trajectory:EightOscillationOnPath}
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[width=\linewidth]{Figures/Trajectory/EightOscillationOnPath}
+    \caption{Пример наложения колебаний восьмёркой на траектории движения по прямой и по окружности}
+    \label{fig:Trajectory:EightOscillationOnPath}
+\end{figure}
+
+Одним из простейших видов колебаний являются колебания зигзагом, представленные на рисунках~\ref{fig:Trajectory:ZigzagOscillation} и~\ref{fig:Trajectory:ZigzagOscillationOnPath}.
+Их параметрическая форма имеет следующий вид:
+
+\begin{gather*}
+    \begin{cases}
+        \begin{aligned}
+            &x_o = 0 \\
+            &y_o = A_h \cdot \left( 0.5 - \left| t - 2 \floor*{\dfrac{t}{2}} - 1 \right| \right)
+        \end{aligned}
+    \end{cases} \\
+    0 \leq t \leq 2 \cdot F_N.
+\end{gather*}
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[width=\linewidth]{Figures/Trajectory/ZigzagOscillation}
+    \caption{Пример колебаний зигзагом}
+    \label{fig:Trajectory:ZigzagOscillation}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \vspace{14pt}
+    \includegraphics[width=\linewidth]{Figures/Trajectory/ZigzagOscillationOnPath}
+    \caption{Пример наложения колебаний зигзагом на траектории движения по прямой и по окружности}
+    \label{fig:Trajectory:ZigzagOscillationOnPath}
 \end{figure}
