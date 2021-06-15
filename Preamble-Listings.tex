@@ -2,7 +2,7 @@
 
 % Значения по умолчанию
 \lstset{
-    basicstyle= \footnotesize\ttfamily,
+    basicstyle=\footnotesize\ttfamily,
     breakatwhitespace=true,% разрыв строк только на whitespacce
     breaklines=true,       % переносить длинные строки
     inputencoding=koi8-r,
@@ -16,58 +16,34 @@
     frame=single
 }
 
-% Стиль для псевдокода: строчки обычно короткие, поэтому размер шрифта побольше
-\lstdefinestyle{pseudocode}{
-    basicstyle=\small,
-    keywordstyle=\color{black}\bfseries\underbar,
-    language=Pseudocode,
-    numberstyle=\footnotesize,
-    commentstyle=\footnotesize\textit{}
-}
-
-% Стиль для обычного кода: маленький шрифт
-\lstdefinestyle{realcode}{
-    basicstyle=\scriptsize,
-    numberstyle=\footnotesize
-}
-
-% Стиль для коротких кусков обычного кода: средний шрифт
-\lstdefinestyle{simplecode}{
-    basicstyle=\footnotesize,
-    numberstyle=\footnotesize
-}
-
-% Стиль для BNF
-\lstdefinestyle{grammar}{
-    basicstyle=\footnotesize,
-    numberstyle=\footnotesize,
-    stringstyle=\bfseries\ttfamily,
-    language=BNF
-}
-
-% Определим свой язык для написания псевдокодов на основе Python
-\lstdefinelanguage[]{Pseudocode}[]{Python}{
-    morekeywords={each,empty,wait,do},% ключевые слова добавлять сюда
-    morecomment=[s]{\{}{\}},% комменты {а-ля Pascal} смотрятся нагляднее
-    literate=% а сюда добавлять операторы, которые хотите отображать как мат. символы
-        {->}{\ensuremath{$\rightarrow$}~}2%
-        {<-}{\ensuremath{$\leftarrow$}~}2%
-        {:=}{\ensuremath{$\leftarrow$}~}2%
-        {<--}{\ensuremath{$\Longleftarrow$}~}2%
-}[keywords,comments]
-
-% Свой язык для задания грамматик в BNF
-\lstdefinelanguage[]{BNF}[]{}{
-    morekeywords={},
-    morecomment=[s]{@}{@},
-    morestring=[b]",%
-    literate=%
-        {->}{\ensuremath{$\rightarrow$}~}2%
-        {*}{\ensuremath{$^*$}~}2%
-        {+}{\ensuremath{$^+$}~}2%
-        {|}{\ensuremath{$|$}~}2%
-}[keywords,comments,strings]
-
 % Подписи к листингам на русском языке.
 \renewcommand\lstlistingname{\cyr\CYRL\cyri\cyrs\cyrt\cyri\cyrn\cyrg}
 \renewcommand\lstlistlistingname{\cyr\CYRL\cyri\cyrs\cyrt\cyri\cyrn\cyrg\cyri}
+
+
+% JSON style from https://gist.github.com/ed-cooper/1927af4ccac39b083440d436d018d253
+\usepackage{xcolor}
+\definecolor{delim}{RGB}{20,105,176}
+\definecolor{numb}{RGB}{106, 109, 32}
+\definecolor{string}{rgb}{0.64,0.08,0.08}
+
+\lstdefinelanguage{json}{
+    basicstyle=\footnotesize\ttfamily,
+    morestring=[b]",
+    stringstyle=\color{string},
+    literate=
+    *{0}{{{\color{numb}0}}}{1}
+        {1}{{{\color{numb}1}}}{1}
+        {2}{{{\color{numb}2}}}{1}
+        {3}{{{\color{numb}3}}}{1}
+        {4}{{{\color{numb}4}}}{1}
+        {5}{{{\color{numb}5}}}{1}
+        {6}{{{\color{numb}6}}}{1}
+        {7}{{{\color{numb}7}}}{1}
+        {8}{{{\color{numb}8}}}{1}
+        {9}{{{\color{numb}9}}}{1}
+        {\{}{{{\color{delim}{\{}}}}{1}
+        {\}}{{{\color{delim}{\}}}}}{1}
+        {[}{{{\color{delim}{[}}}}{1}
+        {]}{{{\color{delim}{]}}}}{1},
+}
