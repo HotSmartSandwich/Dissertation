@@ -10,19 +10,18 @@
     \includepdf[pages=-]{TitlePage}  % Титульный лист
     \includepdf[pages=-]{Task}  % Задание на ВКР
 
+    \setcounter{page}{2} % Нумерация страниц начинается с 2, т.к. титульный лист двусторонний, а задание на ВКР и отзыв рецензента не подшиваются и в общей нумерации не учитываются
+
     \frontmatter  % Отключение нумерации
-    \renewcommand\thefigure{\arabic{figure}}
-    \renewcommand\thetable{\arabic{table}}
 
     \tableofcontents  % Содержание
     \include{Annotation}  % Аннотация
     \include{Introduction}  % Введение
 
     \mainmatter  % Начало нумерации
-    \renewcommand\thefigure{\thechapter.\arabic{figure}}
-    \renewcommand\thetable{\thechapter.\arabic{table}}
 
     \include{SolutionsOverview}  % Обзор существующих решений
+
     \include{Software}  % Программное обеспечение
     \include{RobotProgram}  % Программы для робота
     \include{FindDetail}  % Определние положения и ориентации изделия
@@ -33,4 +32,7 @@
 
     \include{Conclusion}  % Заключение
     \include{Bibliography}  % Список использованных источников
+
+    \includepdf[pages=-]{ReviewerReview}  % Рецензия
+    \includepdf[pages=-]{SupervisorReview}  % Отзыв руководителя
 \end{document}

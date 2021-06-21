@@ -1,8 +1,7 @@
-\chapter{Определение положения и ориентации детали}
+\section{Определение положения и ориентации детали}
 Чтобы скомпенсировать неточности в позиционировании изделия, необходимо определить его положение и ориентацию в абсолютной системе координат, связанной с основанием робота.
 
-
-\section{Определение касания}
+\subsection{Определение касания}
 Для проведения опытных работ использовался сварочный аппарат Panasonic YD-500KR, представленный на рисунке~\ref{fig:FindDetail:Panasonic_YD-500KR}.
 
 \begin{figure}[H]
@@ -39,7 +38,7 @@
 \begin{figure}[H]
     \centering
     \vspace{14pt}
-    \includegraphics[width=\linewidth]{Figures/FindDetail/ElectricalCircuit}
+    \includegraphics[height=9cm]{Figures/FindDetail/ElectricalCircuit}
     \caption{Электрическая схема для определения касания}
     \label{fig:FindDetail:ElectricalCircuit}
 \end{figure}
@@ -53,8 +52,7 @@ E2 -- источник напряжения логики контроллера 
 При контакте электрода и изделия, то есть при замыкании контакта Kt, ток источника E12 протекает через этот контакт, минуя цепи с резисторами R13 и R14.
 Светодиод оптопары перестаёт светить, фототранзистор запирается, а между его контактов фиксируется напряжение +24 В, что сигнализирует о наличии касания между электродом и изделием.
 
-
-\section{Расчёт ориентации детали} \label{sec:DetailOrientation}
+\subsection{Расчёт ориентации детали} \label{subsec:DetailOrientation}
 Наплавка выполняется на уплотнительную поверхность, находящуюся внутри корпуса.
 Для удобства дальнейшей работы, в центре поверхности наплавки расположим связанную с ней систему координат.
 Пример изделия с выделенной штриховкой поверхностью наплавки приведён на рисунке~\ref{fig:FindDetail:ValveExample}.
@@ -62,7 +60,7 @@ E2 -- источник напряжения логики контроллера 
 \begin{figure}[H]
     \centering
     \vspace{14pt}
-    \includegraphics[height=10cm]{Figures/FindDetail/DetailExample}
+    \includegraphics[height=9cm]{Figures/FindDetail/DetailExample}
     \caption{Модель корпуса с выделенной поверхностью наплавки}
     \label{fig:FindDetail:ValveExample}
 \end{figure}
@@ -112,55 +110,54 @@ E2 -- источник напряжения логики контроллера 
             \dfrac{\partial S(A, B, C)}{\partial C} = 2 \sum_{i=1}^{n} \left[
             \dfrac{\partial e(x_i, y_i, z_i)}{\partial C} \cdot e(x_i, y_i, z_i) \right] = 0
         \end{aligned}
-    \end{cases}
+    \end{cases} =
 \end{gather*}
-
 \begin{align}
     \nonumber
-    &\begin{cases}
-         \begin{aligned}
-             &\sum_{i=1}^{n} \left[ x_i \left( A x_i + B y_i - C - z_i \right) \right] = 0 \\
-             &\sum_{i=1}^{n} \left[ y_i \left( A x_i + B y_i - C - z_i \right) \right] = 0 \\
-             &\sum_{i=1}^{n} \left[ - \left( A x_i + B y_i - C - z_i \right) \right] = 0
-         \end{aligned}
-    \end{cases} \\ \nonumber
-    &\begin{cases}
-         \begin{aligned}
-             &\sum_{i=1}^{n} \left[ A x_i^2 + B x_i y_i - C x_i - x_i z_i \right] = 0 \\
-             &\sum_{i=1}^{n} \left[ A x_i y_i + B y_i^2 - C y_i - y_i z_i \right] = 0 \\
-             &\sum_{i=1}^{n} \left[ A x_i + B y_i - C - z_i \right] = 0
-         \end{aligned}
-    \end{cases} \\ \nonumber
-    &\begin{cases}
-         \begin{aligned}
-             &A \sum_{i=1}^{n} x_i^2
-             + B \sum_{i=1}^{n} x_i y_i
-             - C \sum_{i=1}^{n} x_i
-             - \sum_{i=1}^{n} x_i z_i = 0 \\
-             &A \sum_{i=1}^{n} x_i y_i
-             + B \sum_{i=1}^{n} y_i^2
-             - C \sum_{i=1}^{n} y_i
-             - \sum_{i=1}^{n} y_i z_i = 0 \\
-             &A \sum_{i=1}^{n} x_i
-             + B \sum_{i=1}^{n} y_i
-             - C \cdot n - \sum_{i=1}^{n} z_i = 0
-         \end{aligned}
-    \end{cases} \\
-    &\begin{cases}
-         \label{eq:FindDetail:Plane_MNK_Final_System}
-         \begin{aligned}
-             &A \sum_{i=1}^{n} x_i^2
-             + B \sum_{i=1}^{n} x_i y_i
-             - C \sum_{i=1}^{n} x_i
-             = \sum_{i=1}^{n} x_i z_i \\
-             &A \sum_{i=1}^{n} x_i y_i
-             + B \sum_{i=1}^{n} y_i^2
-             - C \sum_{i=1}^{n} y_i
-             = \sum_{i=1}^{n} y_i z_i \\
-             &A \sum_{i=1}^{n} x_i
-             + B \sum_{i=1}^{n} y_i
-             - C \cdot n = \sum_{i=1}^{n} z_i
-         \end{aligned}
+    = &\begin{cases}
+           \begin{aligned}
+               &\sum_{i=1}^{n} \left[ x_i \left( A x_i + B y_i - C - z_i \right) \right] = 0 \\
+               &\sum_{i=1}^{n} \left[ y_i \left( A x_i + B y_i - C - z_i \right) \right] = 0 \\
+               &\sum_{i=1}^{n} \left[ - \left( A x_i + B y_i - C - z_i \right) \right] = 0
+           \end{aligned}
+    \end{cases} = \\ \nonumber
+    = &\begin{cases}
+           \begin{aligned}
+               &\sum_{i=1}^{n} \left[ A x_i^2 + B x_i y_i - C x_i - x_i z_i \right] = 0 \\
+               &\sum_{i=1}^{n} \left[ A x_i y_i + B y_i^2 - C y_i - y_i z_i \right] = 0 \\
+               &\sum_{i=1}^{n} \left[ A x_i + B y_i - C - z_i \right] = 0
+           \end{aligned}
+    \end{cases} = \\ \nonumber
+    = &\begin{cases}
+           \begin{aligned}
+               &A \sum_{i=1}^{n} x_i^2
+               + B \sum_{i=1}^{n} x_i y_i
+               - C \sum_{i=1}^{n} x_i
+               - \sum_{i=1}^{n} x_i z_i = 0 \\
+               &A \sum_{i=1}^{n} x_i y_i
+               + B \sum_{i=1}^{n} y_i^2
+               - C \sum_{i=1}^{n} y_i
+               - \sum_{i=1}^{n} y_i z_i = 0 \\
+               &A \sum_{i=1}^{n} x_i
+               + B \sum_{i=1}^{n} y_i
+               - C \cdot n - \sum_{i=1}^{n} z_i = 0
+           \end{aligned}
+    \end{cases} = \\
+    = &\begin{cases}
+           \label{eq:FindDetail:Plane_MNK_Final_System}
+           \begin{aligned}
+               &A \sum_{i=1}^{n} x_i^2
+               + B \sum_{i=1}^{n} x_i y_i
+               - C \sum_{i=1}^{n} x_i
+               = \sum_{i=1}^{n} x_i z_i \\
+               &A \sum_{i=1}^{n} x_i y_i
+               + B \sum_{i=1}^{n} y_i^2
+               - C \sum_{i=1}^{n} y_i
+               = \sum_{i=1}^{n} y_i z_i \\
+               &A \sum_{i=1}^{n} x_i
+               + B \sum_{i=1}^{n} y_i
+               - C \cdot n = \sum_{i=1}^{n} z_i
+           \end{aligned}
     \end{cases}
 \end{align} \\
 
@@ -229,8 +226,7 @@ E2 -- источник напряжения логики контроллера 
     \beta &= \arctan(B).
 \end{align*}
 
-
-\section{Расчёт положения детали} \label{sec:DetailPosition}
+\subsection{Расчёт положения детали} \label{subsec:DetailPosition}
 Расчёт положения детали основывается на определении точек, лежащих на внутренней грани входного отверстия корпуса.
 Поиск точек происходит в повёрнутой системе координат, параметры которой были определены при поиске ориентации корпуса.
 Таким образом, все найденные точки будут лежать в плоскости $XY$.
@@ -277,30 +273,30 @@ E2 -- источник напряжения логики контроллера 
              \dfrac{\partial S(x_0, y_0, r)}{\partial r} = 2 \sum_{i=1}^{n} \left[
              \dfrac{\partial e(x_i, y_i)}{\partial y_0} \cdot e(x_i, y_i)\right] = 0
          \end{aligned}
-    \end{cases} \\ \nonumber
-    &\begin{cases}
-         \begin{aligned}
-             &2 \sum_{i=1}^{n} \left[ (2 x_0 - 2 x_i) \cdot e(x_i, y_i) \right] = 0 \\
-             &2 \sum_{i=1}^{n} \left[ (2 y_0 - 2 y_i) \cdot e(x_i, y_i) \right] = 0 \\
-             &2 \sum_{i=1}^{n} \left[ 2 r \cdot e(x_i, y_i) \right] = 0
-         \end{aligned}
-    \end{cases} \\ \nonumber
-    &\begin{cases}
-         \begin{aligned}
-             &4 \sum_{i=1}^{n} \left[ x_0 \cdot e(x_i, y_i) - x_i \cdot e(x_i, y_i) \right] = 0 \\
-             &4 \sum_{i=1}^{n} \left[ y_0 \cdot e(x_i, y_i) - x_i \cdot e(x_i, y_i) \right] = 0 \\
-             &4 n \cdot r \sum_{i=1}^{n} e(x_i, y_i) = 0
-         \end{aligned}
-    \end{cases} \\
-    &\begin{cases}
-         \label{eq:FindDetail:Circle_MNK_system}
-         \begin{aligned}
-             &n \cdot x_0 \sum_{i=1}^{n} e(x_i, y_i)
-             - \sum_{i=1}^{n} \left[ x_i \cdot e(x_i, y_i) \right] = 0 \\
-             &n \cdot y_0 \sum_{i=1}^{n} e(x_i, y_i)
-             - \sum_{i=1}^{n} \left[ y_i \cdot e(x_i, y_i) \right] = 0 \\
-             &\sum_{i=1}^{n} e(x_i, y_i) = 0
-         \end{aligned}
+    \end{cases} = \\ \nonumber
+    = &\begin{cases}
+           \begin{aligned}
+               &2 \sum_{i=1}^{n} \left[ (2 x_0 - 2 x_i) \cdot e(x_i, y_i) \right] = 0 \\
+               &2 \sum_{i=1}^{n} \left[ (2 y_0 - 2 y_i) \cdot e(x_i, y_i) \right] = 0 \\
+               &2 \sum_{i=1}^{n} \left[ 2 r \cdot e(x_i, y_i) \right] = 0
+           \end{aligned}
+    \end{cases} = \\ \nonumber
+    = &\begin{cases}
+           \begin{aligned}
+               &4 \sum_{i=1}^{n} \left[ x_0 \cdot e(x_i, y_i) - x_i \cdot e(x_i, y_i) \right] = 0 \\
+               &4 \sum_{i=1}^{n} \left[ y_0 \cdot e(x_i, y_i) - x_i \cdot e(x_i, y_i) \right] = 0 \\
+               &4 n \cdot r \sum_{i=1}^{n} e(x_i, y_i) = 0
+           \end{aligned}
+    \end{cases} = \\
+    = &\begin{cases}
+           \label{eq:FindDetail:Circle_MNK_system}
+           \begin{aligned}
+               &n \cdot x_0 \sum_{i=1}^{n} e(x_i, y_i)
+               - \sum_{i=1}^{n} \left[ x_i \cdot e(x_i, y_i) \right] = 0 \\
+               &n \cdot y_0 \sum_{i=1}^{n} e(x_i, y_i)
+               - \sum_{i=1}^{n} \left[ y_i \cdot e(x_i, y_i) \right] = 0 \\
+               &\sum_{i=1}^{n} e(x_i, y_i) = 0
+           \end{aligned}
     \end{cases}
 \end{align} \\
 
@@ -336,36 +332,36 @@ E2 -- источник напряжения логики контроллера 
              &\sum_{i=1}^{n} \left[
              x_i^2 + y_i^2 - 2 (x_i x_0 + y_i y_0) + x_0^2 + y_0^2 - r^2 \right] = 0
          \end{aligned}
-    \end{cases} \\ \nonumber
-    &\begin{cases}
-         \begin{aligned}
-             &\sum_{i=1}^{n} \left[
-             x_i^3 + x_i y_i^2 - 2 x_i (x_i x_0 + y_i y_0)
-             + x_i \left( x_0^2 + y_0^2 - r^2 \right) \right] = 0 \\
-             &\sum_{i=1}^{n} \left[
-             x_i^2 y_i + y_i^3 - 2 y_i (x_i x_0 + y_i y_0)
-             + y_i \left( x_0^2 + y_0^2 - r^2 \right) \right] = 0 \\
-             &\sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2
-             - 2 \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right)
-             + n \left( x_0^2 + y_0^2 - r^2 \right) = 0
-         \end{aligned}
-    \end{cases} \\
-    &\begin{cases}
-         \label{eq:FindDetail:Circle_MNK_full_system}
-         \begin{aligned}
-             &\sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
-             - 2 \sum_{i=1}^{n} x_i \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right) + \\
-             &\qquad + \sum_{i=1}^{n} x_i \left( x_0^2 + y_0^2 - r^2 \right) = 0 \\
-             \\
-             &\sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
-             - 2 \sum_{i=1}^{n} y_i \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right) + \\
-             &\qquad + \sum_{i=1}^{n} y_i \left( x_0^2 + y_0^2 - r^2 \right) = 0 \\
-             \\
-             &x_0^2 + y_0^2 - r^2 = - \dfrac{1}{n} \left(
-             \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2
-             - 2 \left( x_0 \sum_{i=1}^{n} x_i
-             + y_0 \sum_{i=1}^{n} y_i \right)\right)
-         \end{aligned}
+    \end{cases} = \\ \nonumber
+    = &\begin{cases}
+           \begin{aligned}
+               &\sum_{i=1}^{n} \left[
+               x_i^3 + x_i y_i^2 - 2 x_i (x_i x_0 + y_i y_0)
+               + x_i \left( x_0^2 + y_0^2 - r^2 \right) \right] = 0 \\
+               &\sum_{i=1}^{n} \left[
+               x_i^2 y_i + y_i^3 - 2 y_i (x_i x_0 + y_i y_0)
+               + y_i \left( x_0^2 + y_0^2 - r^2 \right) \right] = 0 \\
+               &\sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2
+               - 2 \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right)
+               + n \left( x_0^2 + y_0^2 - r^2 \right) = 0
+           \end{aligned}
+    \end{cases} = \\
+    = &\begin{cases}
+           \label{eq:FindDetail:Circle_MNK_full_system}
+           \begin{aligned}
+               &\sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
+               - 2 \sum_{i=1}^{n} x_i \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right) + \\
+               &\qquad + \sum_{i=1}^{n} x_i \left( x_0^2 + y_0^2 - r^2 \right) = 0 \\
+               \\
+               &\sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
+               - 2 \sum_{i=1}^{n} y_i \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right) + \\
+               &\qquad + \sum_{i=1}^{n} y_i \left( x_0^2 + y_0^2 - r^2 \right) = 0 \\
+               \\
+               &x_0^2 + y_0^2 - r^2 = - \dfrac{1}{n} \left(
+               \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2
+               - 2 \left( x_0 \sum_{i=1}^{n} x_i
+               + y_0 \sum_{i=1}^{n} y_i \right)\right)
+           \end{aligned}
     \end{cases}
 \end{align} \\
 
@@ -387,39 +383,39 @@ E2 -- источник напряжения логики контроллера 
              \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2
              - 2 \left( x_0 \sum_{i=1}^{n} x_i + y_0 \sum_{i=1}^{n} y_i \right)\right) = 0
          \end{aligned}
-    \end{cases} \\ \nonumber
-    &\begin{cases}
-         \begin{aligned}
-             &2 x_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i - \sum_{i=1}^{n} x_i^2 \right)
-             + 2 y_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i
-             - \sum_{i=1}^{n} x_i y_i \right) + \\
-             &\qquad + \sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
-             - \dfrac{1}{n} \sum_{i=1}^{n} x_i
-             \left( \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right) = 0 \\
-             \\
-             &2 x_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i
-             - \sum_{i=1}^{n} x_i y_i \right)
-             + 2 y_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i - \sum_{i=1}^{n} y_i^2 \right) + \\
-             &\qquad + \sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
-             - \dfrac{1}{n} \sum_{i=1}^{n} y_i
-             \left(\sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right) = 0
-         \end{aligned}
-    \end{cases} \\
-    &\begin{cases}
-         \label{eq:FindDetail:Circle_MNK_final_system}
-         \begin{aligned}
-             &2 x_0 \left( \sum_{i=1}^{n} x_i^2 - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i \right)
-             + 2 y_0 \left( \sum_{i=1}^{n} x_i y_i
-             - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i \right) = \\
-             &\qquad = \sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
-             - \dfrac{1}{n} \sum_{i=1}^{n} x_i \left( \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right) \\
-             \\
-             &2 x_0 \left( \sum_{i=1}^{n} x_i y_i
-             - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i \right)
-             + 2 y_0 \left( \sum_{i=1}^{n} y_i^2 - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i \right) = \\
-             &\qquad = \sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
-             - \dfrac{1}{n} \sum_{i=1}^{n} y_i \left( \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right)
-         \end{aligned}
+    \end{cases} = \\ \nonumber
+    = &\begin{cases}
+           \begin{aligned}
+               &2 x_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i - \sum_{i=1}^{n} x_i^2 \right)
+               + 2 y_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i
+               - \sum_{i=1}^{n} x_i y_i \right) + \\
+               &\qquad + \sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
+               - \dfrac{1}{n} \sum_{i=1}^{n} x_i
+               \left( \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right) = 0 \\
+               \\
+               &2 x_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i
+               - \sum_{i=1}^{n} x_i y_i \right)
+               + 2 y_0 \left( \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i - \sum_{i=1}^{n} y_i^2 \right) + \\
+               &\qquad + \sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
+               - \dfrac{1}{n} \sum_{i=1}^{n} y_i
+               \left(\sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right) = 0
+           \end{aligned}
+    \end{cases} = \\
+    = &\begin{cases}
+           \label{eq:FindDetail:Circle_MNK_final_system}
+           \begin{aligned}
+               &2 x_0 \left( \sum_{i=1}^{n} x_i^2 - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i \right)
+               + 2 y_0 \left( \sum_{i=1}^{n} x_i y_i
+               - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i \right) = \\
+               &\qquad = \sum_{i=1}^{n} x_i^3 + \sum_{i=1}^{n} x_i y_i^2
+               - \dfrac{1}{n} \sum_{i=1}^{n} x_i \left( \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right) \\
+               \\
+               &2 x_0 \left( \sum_{i=1}^{n} x_i y_i
+               - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} y_i \right)
+               + 2 y_0 \left( \sum_{i=1}^{n} y_i^2 - \dfrac{1}{n} \sum_{i=1}^{n} x_i \sum_{i=1}^{n} x_i \right) = \\
+               &\qquad = \sum_{i=1}^{n} x_i^2 y_i + \sum_{i=1}^{n} y_i^3
+               - \dfrac{1}{n} \sum_{i=1}^{n} y_i \left( \sum_{i=1}^{n} x_i^2 + \sum_{i=1}^{n} y_i^2 \right)
+           \end{aligned}
     \end{cases}
 \end{align} \\
 
