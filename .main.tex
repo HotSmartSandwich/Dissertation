@@ -7,10 +7,11 @@
 \include{Preamble-Listings}
 
 \begin{document}
-    \includepdf[pages=-]{TitlePage}  % Титульный лист
-    \includepdf[pages=-]{Task}  % Задание на ВКР
+    \includepdf[pages=1]{TitlePage}  % Титульный лист
+%    \includepdf[pages=-]{Task}  % Задание на ВКР
+    \includepdf[pages=2-4]{signed}  % Подписанные оборот титульного листа и задание на ВКР
 
-    \setcounter{page}{2} % Нумерация страниц начинается с 2, т.к. титульный лист двусторонний, а задание на ВКР и отзыв рецензента не подшиваются и в общей нумерации не учитываются
+    \setcounter{page}{2}  % Нумерация страниц начиная с 2
 
     \frontmatter  % Отключение нумерации
 
@@ -33,6 +34,7 @@
     \include{Conclusion}  % Заключение
     \include{Bibliography}  % Список использованных источников
 
-    \includepdf[pages=-]{ReviewerReview}  % Рецензия
-    \includepdf[pages=-]{SupervisorReview}  % Отзыв руководителя
+%    \includepdf[pages=-]{ReviewerReview}  % Рецензия
+%    \includepdf[pages=-]{SupervisorReview}  % Отзыв руководителя
+    \includepdf[pages=5-8]{signed}  % Подписанные рецензия и отзыв
 \end{document}
